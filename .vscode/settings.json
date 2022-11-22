@@ -1,5 +1,7 @@
 {
-  "cSpell.words": [],
+  "cSpell.words": [
+    "Wappalyzer"
+  ],
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
