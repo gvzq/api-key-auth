@@ -27,8 +27,8 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 function logger(req, res, next) {
-  const { params, path } = req;
-  winston.info(path, params, req.header('x-api-key'));
+  const { path } = req;
+  winston.info(`${decodeURI(path)} ${req.header('x-api-key')}`);
   next();
 }
 

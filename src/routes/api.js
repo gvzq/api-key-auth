@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const Wappalyzer = require('wappalyzer');
 const log = require('../middleware/logger').default;
+const authenticateKey = require('../middleware/auth-key').default;
 
 const router = express.Router();
 
@@ -19,14 +20,11 @@ router.post('/register', (req, res) => {
   res.status(201).send({ data: username });
 });
 
-// get list of tech used by website
-router.get('/analyze/:website', async (req, res) => {
-  const { website } = req.params;
-  const isValidWebsite = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_+.~#?&//=]*)/gm;
-  let tech = [];
+router.post('/analyze/', authenticateKey, async (req, res) => {
+  let { website } = req.body;
 
-  if (!website.match(isValidWebsite)) {
-    res.sendStatus(206);
+  if (!/^https?:\/\//i.test(website)) {
+    website = `http://${website}`;
   }
 
   const wappalyzer = new Wappalyzer();
@@ -36,14 +34,22 @@ router.get('/analyze/:website', async (req, res) => {
     site.on('error', (e) => {
       log.error(`wappalyzer error: ${e}`);
     });
-    tech = await site.analyze();
+    const tech = await site.analyze();
+    tech.technologies = tech?.technologies
+      .filter((elem) => elem?.confidence > 0 && elem?.categories.at(0)?.id !== 19)
+      .sort((a, b) => {
+        const keyA = a?.categories.at(0)?.id;
+        const keyB = b?.categories.at(0)?.id;
+        if (keyA < keyB) return -1;
+        if (keyA > keyB) return 1;
+        return 0;
+      });
     await wappalyzer.destroy();
+    res.status(200).send(tech);
   } catch (error) {
     log.error(error);
+    res.sendStatus(400);
   }
-
-  tech = tech?.technologies.filter((elem) => elem.confidence === 100);
-  res.status(200).send(tech);
 });
 
 module.exports = router;

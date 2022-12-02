@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const cors = require('cors');
 const logger = require('./src/middleware/logger').middleware;
 const log = require('./src/middleware/logger').default;
 const apiRouter = require('./src/routes/api');
@@ -9,6 +10,7 @@ const app = express();
 
 app.use(logger);
 app.use(express.json());
+app.use(cors());
 
 app.use('/api', apiRouter);
 
