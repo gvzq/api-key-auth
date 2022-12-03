@@ -2,9 +2,10 @@
   "name": "api-key-nodejs",
   "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "dev": "nodemon app.js"
+    "dev": "nodemon app.js",
+    "start": "functions-framework --target=app"
   },
   "engines": {
     "node": "16.x"
@@ -20,6 +21,7 @@
     "winston": "^3.8.2"
   },
   "devDependencies": {
+    "@google-cloud/functions-framework": "^3.1.2",
     "eslint": "^7.32.0 || ^8.2.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.25.2"
