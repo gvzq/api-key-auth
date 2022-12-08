@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const Wappalyzer = require('wappalyzer');
+const validUrl = require('valid-url');
 const log = require('../middleware/logger').default;
 const authenticateKey = require('../middleware/auth-key').default;
 
@@ -23,8 +24,12 @@ router.post('/register', (req, res) => {
 router.post('/analyze/', authenticateKey, async (req, res) => {
   let { website } = req.body;
 
-  if (!/^https?:\/\//i.test(website)) {
-    website = `http://${website}`;
+  if (typeof website === 'string') {
+    website = website.trim();
+  }
+
+  if (!validUrl.isUri(website)) {
+    return res.status(400).send({ error: `'${website}' is not a valid URL` });
   }
 
   const wappalyzer = new Wappalyzer();
